@@ -75,7 +75,7 @@ class MyForm extends React.Component {
       emailData.replyToAddresses= object.email_from.split(";");
 
 
-    /*fetch('https://4puqpns0ze.execute-api.ap-southeast-2.amazonaws.com/dev/sendMail', {
+    /*fetch('https://xxxxxxxxxx.execute-api.ap-southeast-2.amazonaws.com/dev/sendMail', {
        method: 'POST',
        body: data1,
      }).then(results => {
