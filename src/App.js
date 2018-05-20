@@ -37,14 +37,13 @@ class MyForm extends React.Component {
       });
       return;
     }
-    const form = event.target;
+    var form = event.target;
 
     var data = new FormData(form);
 
     for (let name of data.keys()) {
       const input = form.elements[name];
       const parserName = input.dataset.parse;
-      console.log('parser name is', parserName);
       if (parserName) {
         const parsedValue = data.get(name);//inputParsers[parserName](data.get(name))
         data.set(name, parsedValue);
@@ -54,8 +53,6 @@ class MyForm extends React.Component {
       data.forEach(function(value, key){
         object[key] = value;
       });
-      var json = JSON.stringify(object);
-      console.log("this is this element : "+json);
 
     this.setState({
     	res: stringifyFormData(data),
@@ -63,15 +60,20 @@ class MyForm extends React.Component {
       displayErrors: false,
       output: ""
     });
-    var emailData = {
-      "bccEmailAddresses": object.email_bcc.split(";"),
-      "ccEmailAddresses": object.email_cc.split(";"),
-      "toEmailAddresses": object.email_to.split(";"),
-      "bodyData": object.email_body,
-      "bodySubject": object.email_subject,
-      "sourceEmail": object.email_from,
-      "replyToAddresses": object.email_from.split(";")
+    var emailData = {};
+      if (object.email_bcc.length){
+        emailData.bccEmailAddresses= object.email_bcc.split(";");
       }
+      if (object.email_cc.length){
+        emailData.ccEmailAddresses=object.email_cc.split(";");
+      }
+
+      emailData.toEmailAddresses = object.email_to.split(";");
+      emailData.bodyData= object.email_body;
+      emailData.bodySubject=object.email_subject;
+      emailData.sourceEmail= object.email_from;
+      emailData.replyToAddresses= object.email_from.split(";");
+
 
     /*fetch('https://4puqpns0ze.execute-api.ap-southeast-2.amazonaws.com/dev/sendMail', {
        method: 'POST',
@@ -84,8 +86,12 @@ class MyForm extends React.Component {
      axios.post(serverUrl+'/sendMail', emailData)
        .then(response =>
          {
-           this.clearFormData();
-           this.setState({output: response.data.message})
+           this.setState({
+           	 res: {},
+             invalid: false,
+             displayErrors: true,
+             output: response.data.message
+           });
            console.log(response)
          })
 
@@ -103,13 +109,13 @@ class MyForm extends React.Component {
           <label htmlFor="email_from">From Email:</label>
           <input id="email_from" name="email_from" type="email" placeholder="Enter From Email" required />
 
-          <label htmlFor="email_to">To Email:</label>
+          <label htmlFor="email_to">To Email: <small> Use semicolon to separate multiple emailid</small></label>
           <input id="email_to" name="email_to" type="text" placeholder="Enter To Email" required />
 
-          <label htmlFor="email_cc">CC Email:</label>
+          <label htmlFor="email_cc">CC Email:<small> Use semicolon to separate multiple emailid</small></label>
           <input id="email_cc" name="email_cc" type="text" placeholder="Enter CC Email"/>
 
-          <label htmlFor="email_bcc">BCC Email:</label>
+          <label htmlFor="email_bcc">BCC Email:<small> Use semicolon to separate multiple emailid</small></label>
           <input id="email_bcc" name="email_bcc" type="text"  placeholder="Enter BCC Email"/>
 
           <label htmlFor="email_subject">Subject:</label>
