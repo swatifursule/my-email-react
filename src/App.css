@@ -28,14 +28,6 @@
 }
 
 body {
-  padding: 40px;
-}
-
-#form {
-  max-width: 400px;
-}
-
-body {
   font-family: 'Roboto Slab', sans-serif;
   background: white;
   color: #484848;
@@ -51,6 +43,20 @@ input {
   font-size: 16px;
   outline: none;
 }
+
+textarea {
+  display: block;
+  margin-bottom: 15px;
+  margin-top: 5px;
+  padding: 10px;
+  border: 1px solid #cfcfcf;
+  font-family: 'Roboto Slab', sans-serif;
+  font-size: 16px;
+  outline: none;
+  width: 500px;
+  height: 150px;
+}
+
 .displayErrors input:invalid {
   border-color: #f73772;
 }

@@ -1,30 +1,15 @@
 import React, { Component } from 'react';
-
 import './App.css';
 import axios from 'axios'
 
-const inputParsers = {
-  date(input) {
-    const split = input.split('/');
-    const day = split[1]
-    const month = split[0];
-    const year = split[2];
-    return `${year}-${month}-${day}`;
-  },
-  uppercase(input) {
-    return input.toUpperCase();
-  },
-  number(input) {
-    return parseFloat(input);
-  },
-};
+const serverUrl= "https://4puqpns0ze.execute-api.ap-southeast-2.amazonaws.com/dev";
 
 class ShakingError extends React.Component {
 	constructor() { super(); this.state = { key: 0 }; }
 
 	componentWillReceiveProps() {
     // update key to remount the component to rerun the animation
-  	this.setState({ key: ++this.state.key });
+  	this.setState({ key: ++this.getState().key });
   }
 
   render() {
@@ -37,6 +22,9 @@ class MyForm extends React.Component {
     super();
     this.state = {};
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  clearFormData = () => {
+    this.setState({});
   }
 
   handleSubmit(event) {
@@ -58,12 +46,10 @@ class MyForm extends React.Component {
       const parserName = input.dataset.parse;
       console.log('parser name is', parserName);
       if (parserName) {
-        const parsedValue = inputParsers[parserName](data.get(name))
+        const parsedValue = data.get(name);//inputParsers[parserName](data.get(name))
         data.set(name, parsedValue);
       }
     }
-    console.log("data  "+JSON.stringify(stringifyFormData(data), 4, 1));
-
     var object = {};
       data.forEach(function(value, key){
         object[key] = value;
@@ -74,20 +60,19 @@ class MyForm extends React.Component {
     this.setState({
     	res: stringifyFormData(data),
       invalid: false,
-      displayErrors: false
+      displayErrors: false,
+      output: ""
     });
-  console.log("this.state.res : "+JSON.stringify(object));
-    var data1 = {
+    var emailData = {
       "bccEmailAddresses": object.email_bcc.split(";"),
       "ccEmailAddresses": object.email_cc.split(";"),
       "toEmailAddresses": object.email_to.split(";"),
       "bodyData": object.email_body,
-      "subjectData": object.email_subject,
+      "bodySubject": object.email_subject,
       "sourceEmail": object.email_from,
       "replyToAddresses": object.email_from.split(";")
       }
 
-    console.log("my data1 is "+JSON.stringify(data1,4,1));
     /*fetch('https://4puqpns0ze.execute-api.ap-southeast-2.amazonaws.com/dev/sendMail', {
        method: 'POST',
        body: data1,
@@ -96,14 +81,17 @@ class MyForm extends React.Component {
      }).catch(error => {
        console.log(error);
      });*/
-
-     axios.post('https://4puqpns0ze.execute-api.ap-southeast-2.amazonaws.com/dev/sendMail', data1)
-       .then(response => console.log(response))
+     axios.post(serverUrl+'/sendMail', emailData)
+       .then(response =>
+         {
+           this.clearFormData();
+           this.setState({output: response.data.message})
+           console.log(response)
+         })
 
   }
-
   render() {
-  	const { res, invalid, displayErrors } = this.state;
+  	const { res, invalid, displayErrors, output } = this.state;
     return (
     	<div>
         <form
@@ -111,25 +99,18 @@ class MyForm extends React.Component {
           noValidate
           className={displayErrors ? 'displayErrors' : ''}
          >
-          <label htmlFor="username">Username:</label>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            data-parse="uppercase"
-          />
-
+          <h1> Email Service </h1>
           <label htmlFor="email_from">From Email:</label>
-          <input id="email_from" name="email_from" type="email" required />
+          <input id="email_from" name="email_from" type="email" placeholder="Enter From Email" required />
 
           <label htmlFor="email_to">To Email:</label>
-          <input id="email_to" name="email_to" type="email" required />
+          <input id="email_to" name="email_to" type="text" placeholder="Enter To Email" required />
 
           <label htmlFor="email_cc">CC Email:</label>
-          <input id="email_cc" name="email_cc" type="email" required />
+          <input id="email_cc" name="email_cc" type="text" placeholder="Enter CC Email"/>
 
           <label htmlFor="email_bcc">BCC Email:</label>
-          <input id="email_bcc" name="email_bcc" type="email" required />
+          <input id="email_bcc" name="email_bcc" type="text"  placeholder="Enter BCC Email"/>
 
           <label htmlFor="email_subject">Subject:</label>
           <input
@@ -141,44 +122,25 @@ class MyForm extends React.Component {
           />
 
           <label htmlFor="email_body">Email Body:</label>
-          <input
-            id="email_body"
-            name="email_body"
-            type="text"
-            placeholder="Email Text Body"
-            required
-          />
-          <label htmlFor="date">Birthdate:</label>
-          <input
-            id="birthdate"
-            name="birthdate"
-            type="text"
-            data-parse="date"
-            placeholder="MM/DD//YYYY"
-            pattern="\d{2}\/\d{2}/\d{4}"
-            required
-          />
+          <textarea id="email_body" name="email_body" placeholder="Email Body"></textarea>
 
           <button>Send Email</button>
+
         </form>
-
-
-
-        <div className="res-block">
+        <div>
           {invalid && (
             <ShakingError text="Form is not valid" />
           )}
           {!invalid && res && (
           	<div>
-              <h3>Transformed data to be sent:</h3>
-              <pre>FormData {res}</pre>
+              <label>Email Sent successfully {output} </label>
           	</div>
           )}
         </div>
     	</div>
     );
   }
-}
+};
 
 
 function stringifyFormData(fd) {
@@ -191,7 +153,7 @@ function stringifyFormData(fd) {
 class App extends Component {
   render() {
     return (
-	<MyForm />
+      <MyForm />
     );
   }
 }
