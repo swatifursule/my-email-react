@@ -4,11 +4,13 @@ my-email-react uses ReactJS.
 
 <h3>To deploy frontend, heroku platform can be used.</h3>
 
-1. Clone the repository: git clone https://github.com/swatifursule/email-frontend.git
+1. Clone the repository: 
+    git clone https://github.com/swatifursule/email-frontend.git
 2. change the serverUrl in App.js 
-3. Run frontend server locally
-npm install
-npm start
+    const serverUrl= "https://xxxxxxxxxx.execute-api.ap-southeast-2.amazonaws.com/dev";
+3. Run frontend server locally 
+      npm install
+      npm start
 4. Run frontend server on Heroku using github url.
 
 
