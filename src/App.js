@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios'
 
-const serverUrl= "https://4puqpns0ze.execute-api.ap-southeast-2.amazonaws.com/dev";
+const serverUrl= "https://xxxxxxxxxx.execute-api.ap-southeast-2.amazonaws.com/dev";
 
 class ShakingError extends React.Component {
 	constructor() { super(); this.state = { key: 0 }; }
